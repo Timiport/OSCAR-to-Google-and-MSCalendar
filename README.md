@@ -1,2 +1,2 @@
-# OSCAR-to-Google-Calendar
-A application to automatically fetch course information from OSCAR and convert it in to events in google calendar
+# OSCAR-to-Google-and-MSCalendar
+A application to automatically fetch course information from OSCAR and convert it in to events in Google calendar and Microsoft Calendar
