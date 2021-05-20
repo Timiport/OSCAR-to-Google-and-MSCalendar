@@ -1,13 +1,11 @@
 import sys
 import os
 sys.path.append(os.getcwd())
-from MSCalendarAPI.calendarCreater import MSCalendar
+from GoogleCalendarAPI import createEvent
 from runner.jsonParser import jsonParser
 
 def main():
-    calendar = MSCalendar()
-    calendar.userAuthentication()
-
+    
     parser = jsonParser('s','s')
     courseElement, semester = parser.getCourseInformation()
     #print(courseElement)
@@ -16,10 +14,8 @@ def main():
     location = courseElement['meetings'][0]['location']
     weekDays = courseElement['meetings'][0]['days']
     instructor = courseElement['meetings'][0]['instructor']
-
-    print (time[ : time.index("-")])
-    print (time[time.index("-") + 2: ])
-    calendar.createEvent('CS 1332', location, semester, time, weekDays)
+    createEvent.createEvent("CS 1334", location, time, semester)
+    
 
 if __name__ == "__main__":
     main()

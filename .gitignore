@@ -8,7 +8,9 @@ __pycache__/
 
 # C extensions
 *.so
-o365_token.txt
+
+# custom file
+token.json
 result.json
 
 # Distribution / packaging
