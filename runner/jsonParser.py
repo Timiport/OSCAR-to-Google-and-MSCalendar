@@ -3,11 +3,11 @@ import json
 
 class jsonParser:
   
-    def __init__(self, courseName, crn):
+    def __init__(self, courseName, crn=0):
         self.courseName = courseName
         self.crn = str(crn)
 
-    def getCourseInformation(self): 
+    def getCourseInformation(self, semDate): 
         """ Method aims to 
 
         Returns:
@@ -15,15 +15,20 @@ class jsonParser:
         """
         f = open('result.json')
         course = json.load(f)
-        courseInfo = list(filter(lambda x: x["identifier"] == "CS 1332", course))
-                                 #and x["restrictions"]["Campuses"]["requirements"][0] == "Georgia Tech-Atlanta *", course))
+        courseInfo = list(filter(lambda x: x["identifier"] == "CS 1332"
+                                 and semDate in x['semester'] , course))
 
         classList = courseInfo[0]["sections"]
         semester = courseInfo[0]["semester"]
 
-        for element in classList:
-            if element["crn"] == "90770":
-                return element, semester
+        if not self.crn == 0:
+            for element in classList:
+                if element["crn"] == self.crn:
+                    return element, semester
+                
+            return classList, semester
+        else:
+            return classList, semester
 
     # print(courseInfo[0]["crn"])
     #print(json.dumps(courseInfo, indent = 4))
