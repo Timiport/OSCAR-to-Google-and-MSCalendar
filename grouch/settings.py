@@ -15,8 +15,9 @@ SPIDER_MODULES = ['grouch.spiders']
 NEWSPIDER_MODULE = 'grouch.spiders'
 
 
+
 # -1 for all of them
-SEMESTER_STOP = 1
+SEMESTER_STOP = 2
 # empty for all of them
 SUBJECTS = ['CS']
 SEMESTER_ACCEPT = ("02", "08", "05")  # Has to be a tuple

@@ -15,9 +15,9 @@ class jsonParser:
         """
         f = open('result.json')
         course = json.load(f)
-        courseInfo = list(filter(lambda x: x["identifier"] == "CS 1332"
+        courseInfo = list(filter(lambda x: x["identifier"] == self.courseName
                                  and semDate in x['semester'] , course))
-
+        print(courseInfo)
         classList = courseInfo[0]["sections"]
         semester = courseInfo[0]["semester"]
 
@@ -32,4 +32,5 @@ class jsonParser:
 
     # print(courseInfo[0]["crn"])
     #print(json.dumps(courseInfo, indent = 4))
+
 

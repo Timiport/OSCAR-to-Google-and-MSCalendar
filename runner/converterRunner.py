@@ -8,12 +8,12 @@ from gui.startWindows import GuiRunner
 
 def main():
     
-    parser = jsonParser('s','s')
-    courseElement, semester = parser.getCourseInformation("08")
+    # parser = jsonParser('s','s')
+    # courseElement, semester = parser.getCourseInformation("08")
     #print(courseElement)
     window = Tk()
     gui = GuiRunner(window)
-    gui.fillTable(courseElement)
+    # gui.fillTable(courseElement)
     window.mainloop()   
     #print(semester)
     # time = courseElement['meetings'][0]['time']

@@ -1,10 +1,14 @@
 import sys
 import os
+from multiprocessing import Process
 from tkinter import font, ttk, messagebox
 sys.path.append(os.getcwd())
 from tkinter import *
 from gui.courseDescription import getCourseList
 from GoogleCalendarAPI.createEvent import createEvent
+from runner.crawlerRunner import crawlCourseJson
+from runner.jsonParser import jsonParser
+from grouch import settings
 
 class GuiRunner:
     def __init__(self, root):
@@ -15,14 +19,16 @@ class GuiRunner:
         self.root.iconbitmap('tech-logo.ico')
         self.courseDescription = getCourseList()
         self.treeTable = NONE
-        self.sem = StringVar()
+        self.semester = ""
+        self.crawlerProcess = Process(target=crawlCourseJson)
+        
         self.queryRow()
         self.table()
 
     def queryRow(self):
 
+        # Set each element in gui
         initFrame = LabelFrame(self.root, text="Course Information", width=200)
-        
         courseName = StringVar()
         courseName.set(self.courseDescription[0])
 
@@ -45,14 +51,14 @@ class GuiRunner:
         crn = Entry(initFrame, width=15, font=("Arial", 13), textvariable=optionalText, fg="grey")
         crn.bind("<Button-1>", on_click_delete)
 
-        getCourse = Button(self.root, text="Get Course", font=("Arial", 13))
+        sem = StringVar()
+        sem.set("08")
+        fallSemester = Radiobutton(initFrame, text="Fall", variable=sem, value="08", font=("Arial", 13), command=lambda: sem.set("08"))
+        SpringSemester = Radiobutton(initFrame, text="Spring", variable=sem, value="02", font=("Arial", 13), command=lambda: sem.set("02"))
+        SummerSemester = Radiobutton(initFrame, text="Summer", variable=sem, value="05", font=("Arial", 13), command=lambda: sem.set("05"))
+        
+        getCourse = Button(self.root, text="Get Course", font=("Arial", 13), command=lambda: self.fetchCourse(courseName.get(), crn.get(), sem.get()))
 
-        
-        self.sem.set("fall")
-        fallSemester = Radiobutton(initFrame, text="Fall", variable=self.sem, value="fall", font=("Arial", 13), command=lambda: self.sem.set("fall"))
-        SpringSemester = Radiobutton(initFrame, text="Spring", variable=self.sem, value="spring", font=("Arial", 13), command=lambda: self.sem.set("spring"))
-        SummerSemester = Radiobutton(initFrame, text="Summer", variable=self.sem, value="summer", font=("Arial", 13), command=lambda: self.sem.set("summer"))
-        
         line = ttk.Separator(self.root, orient='horizontal')
 
         convert = Button(self.root, text="Convert to Calendar", font=("Arial", 13), bg="silver", command=self.selectToEvent)
@@ -145,4 +151,25 @@ class GuiRunner:
             messagebox.showerror("Error", "No course selected")
             return
         # pass everything to create event
-        #createEvent(values[0], values[6], values[5], self.sem, values[4])
+        #createEvent(values[0], values[6], values[5], self.semester, values[4])
+
+    def fetchCourse(self, courseName, crn, semDate):
+        # set settings
+        settings.SUBJECTS = courseName[:courseName.index(":")]
+        
+
+
+        if (self.crawlerProcess.is_alive()):
+            self.crawlerProcess.terminate()
+            self.crawlerProcess.join()
+        self.crawlerProcess.start()
+        self.crawlerProcess.join()
+
+        # Fill table with the course
+        if len(crn) < 5:
+            parser = jsonParser(courseName)
+        else:
+            parser = jsonParser(courseName, crn)
+
+        courseElement, self.semester = parser.getCourseInformation(semDate)
+        self.fillTable(courseElement)

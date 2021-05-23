@@ -51,7 +51,7 @@ class OscarSpider(scrapy.Spider):
 
     def parse_detail(self, response):
         loader = CourseLoader(item=items.Course(), response=response)
-        loader.add_value("semester", self.semester)
+        
         loader.add_value("year", self.year)
         loader.add_css('fields', 'span.fieldlabeltext::text', re=r'^(.*?):')
         loader.add_css('fullname', 'td.nttitle::text', re=r'.*')
@@ -68,6 +68,9 @@ class OscarSpider(scrapy.Spider):
 
         url = response.css('td.ntdefault a::attr(href)').re('.*listcrse.*')
 
+        str = url[0]
+        loader.add_value("semester", str[str.index("=") + 1:str.index("&")])
+        
         if url:
             return scrapy.Request(self.base+url[0], self.parse_section, meta={'course': loader})
         else:
