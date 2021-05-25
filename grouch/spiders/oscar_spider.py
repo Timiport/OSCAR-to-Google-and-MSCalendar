@@ -1,14 +1,20 @@
 import scrapy
+import sys
+import os
+sys.path.append(os.getcwd())
 from grouch.loaders import CourseLoader, SectionLoader
 import grouch
+from grouch import settings
 from grouch import items
 
 
 class OscarSpider(scrapy.Spider):
+
     name = "oscar"
     allowed_domains = ['oscar.gatech.edu']
     start_urls = ['https://oscar.gatech.edu/pls/bprod/bwckctlg.p_disp_dyn_ctlg']
     base = 'https://oscar.gatech.edu'
+        
 
     field_formats = {
         "Grade Basis": "grade_basis",
@@ -35,8 +41,8 @@ class OscarSpider(scrapy.Spider):
 
     def parse_term(self, response):
         subjects = response.css("#subj_id option::attr(value)").re(".*")
-        if grouch.settings.SUBJECTS:
-            subjects = grouch.settings.SUBJECTS
+        if settings.SUBJECTS:
+            subjects = settings.SUBJECTS
         for subject in subjects:  # subjects:
             yield scrapy.FormRequest.from_response(response,
                                                    callback=self.parse_courses,
@@ -70,7 +76,8 @@ class OscarSpider(scrapy.Spider):
 
         str = url[0]
         loader.add_value("semester", str[str.index("=") + 1:str.index("&")])
-        
+    
+
         if url:
             return scrapy.Request(self.base+url[0], self.parse_section, meta={'course': loader})
         else:
@@ -120,3 +127,9 @@ class OscarSpider(scrapy.Spider):
         loader.add_value('instructors', list(instructors))
 
         return loader.load_item()
+
+    def getSubject(self):
+        return self.inputSubject
+
+    def setSubject(self, sub):
+        self.inputSubject = sub

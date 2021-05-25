@@ -3,8 +3,10 @@ from multiprocessing import Process
 
 def crawlCourseJson():
     try:
-        os.remove('result.json')
-    except OSError:
+        open('result.json', 'w').close()
+    except:
         pass
 
+
     os.system('scrapy crawl -o result.json -t json oscar')
+

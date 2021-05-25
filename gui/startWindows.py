@@ -1,14 +1,20 @@
 import sys
 import os
-from multiprocessing import Process
-from tkinter import font, ttk, messagebox
 sys.path.append(os.getcwd())
+import time
+from multiprocessing import Process
+from threading import Thread
+from tkinter import font, ttk, messagebox
+
+from grouch.spiders.oscar_spider import OscarSpider
+# from grouch.spiders.oscar_spider import inputSubject 
 from tkinter import *
 from gui.courseDescription import getCourseList
 from GoogleCalendarAPI.createEvent import createEvent
 from runner.crawlerRunner import crawlCourseJson
 from runner.jsonParser import jsonParser
 from grouch import settings
+from grouch.settingsReader import isSameCourse, setCourseName
 
 class GuiRunner:
     def __init__(self, root):
@@ -20,7 +26,7 @@ class GuiRunner:
         self.courseDescription = getCourseList()
         self.treeTable = NONE
         self.semester = ""
-        self.crawlerProcess = Process(target=crawlCourseJson)
+        
         
         self.queryRow()
         self.table()
@@ -57,11 +63,17 @@ class GuiRunner:
         SpringSemester = Radiobutton(initFrame, text="Spring", variable=sem, value="02", font=("Arial", 13), command=lambda: sem.set("02"))
         SummerSemester = Radiobutton(initFrame, text="Summer", variable=sem, value="05", font=("Arial", 13), command=lambda: sem.set("05"))
         
-        getCourse = Button(self.root, text="Get Course", font=("Arial", 13), command=lambda: self.fetchCourse(courseName.get(), crn.get(), sem.get()))
+        getCourse = Button(self.root, text="Get Course", font=("Arial", 13), command=lambda: self.fetchCourse(courseName.get(), crn.get(), sem.get(), progress))
 
-        line = ttk.Separator(self.root, orient='horizontal')
+        line1 = ttk.Separator(self.root, orient='horizontal')
 
         convert = Button(self.root, text="Convert to Calendar", font=("Arial", 13), bg="silver", command=self.selectToEvent)
+
+        line2 = ttk.Separator(self.root, orient='horizontal')
+        
+        progress = ttk.Progressbar(self.root, orient=HORIZONTAL, length=300, mode='indeterminate')
+        progress['maximum'] = 100
+        
 
         #Add object to windows
         initFrame.grid(row=0, column=0, padx=20, pady=20)
@@ -74,8 +86,10 @@ class GuiRunner:
         SpringSemester.grid(row=0, column=6)
         SummerSemester.grid(row=0, column=7, padx=(0, 20))
         getCourse.grid(row=0, column=2, padx=(5,20))
-        line.grid(row=1, columnspan=3, sticky="ew", padx=30)
+        line1.grid(row=1, columnspan=3, sticky="ew", padx=30)
         convert.grid(row=3, columnspan=3)
+        line2.grid(row=4, columnspan=3, sticky="ew", padx=30, pady=(20,10))
+        progress.grid(row=5, columnspan=3, sticky='e', padx=30)
 
     def table(self):
         style = ttk.Style()
@@ -153,23 +167,59 @@ class GuiRunner:
         # pass everything to create event
         #createEvent(values[0], values[6], values[5], self.semester, values[4])
 
-    def fetchCourse(self, courseName, crn, semDate):
+    def fetchCourse(self, courseName, crn, semDate, progress):
+
+        Stop_Thread = False
+        # progressThread = Thread(target=self.bar, args=(progress, lambda: Stop_Thread))
+        # progressThread.start()
+
         # set settings
-        settings.SUBJECTS = courseName[:courseName.index(":")]
+        
+        if not isSameCourse(courseName[:courseName.index(":")]):
+            setCourseName(courseName[:courseName.index(":")])
+            print(courseName[:courseName.index(":")] + "LISSTTTT")
+            crawlerThread = Thread(target=crawlCourseJson)
+
+            # if (crawlerThread.is_alive()):
+            #     crawlerThread.terminate()
+            #     crawlerThread.join()
+            crawlerThread.start()
+            crawlerThread.join()
+
+        Stop_Thread = True
+        # progressThread.join()
+        
+        
+        # Fill table with the course
+        if len(crn) < 5:
+            parser = jsonParser(courseName[:courseName.index(":")])
+        else:
+            parser = jsonParser(courseName[:courseName.index(":")], crn)
+
+        try:
+            courseElement, self.semester = parser.getCourseInformation(semDate)
+        except ValueError:
+            messagebox.showerror("Error", "No course match the information you entered")
+            return
+
+        print("filling table")
+        self.fillTable(courseElement)
+        self.treeTable.update_idletasks()
+
+    def bar(self, progress, stop):
+        print("barrrrrrrrr")
+        
+            
+        for i in range(100):
+            progress['value']+=1
+            self.root.update_idletasks()
+            time.sleep(0.2)
+            
+        for i in range(100):
+            progress['value']-=1
+            self.root.update_idletasks()
+            time.sleep(0.2)
         
 
 
-        if (self.crawlerProcess.is_alive()):
-            self.crawlerProcess.terminate()
-            self.crawlerProcess.join()
-        self.crawlerProcess.start()
-        self.crawlerProcess.join()
-
-        # Fill table with the course
-        if len(crn) < 5:
-            parser = jsonParser(courseName)
-        else:
-            parser = jsonParser(courseName, crn)
-
-        courseElement, self.semester = parser.getCourseInformation(semDate)
-        self.fillTable(courseElement)
+        

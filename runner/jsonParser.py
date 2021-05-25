@@ -8,7 +8,7 @@ class jsonParser:
         self.crn = str(crn)
 
     def getCourseInformation(self, semDate): 
-        """ Method aims to 
+        """ Method to return the course information for the user
 
         Returns:
             [type]: [description]
@@ -17,7 +17,9 @@ class jsonParser:
         course = json.load(f)
         courseInfo = list(filter(lambda x: x["identifier"] == self.courseName
                                  and semDate in x['semester'] , course))
-        print(courseInfo)
+        if len(courseInfo) == 0:
+            raise ValueError("No information is available")
+
         classList = courseInfo[0]["sections"]
         semester = courseInfo[0]["semester"]
 
