@@ -7,7 +7,7 @@ from threading import Thread
 from tkinter import font, ttk, messagebox
 
 from grouch.spiders.oscar_spider import OscarSpider
-# from grouch.spiders.oscar_spider import inputSubject 
+from multiprocessing import Process
 from tkinter import *
 from gui.courseDescription import getCourseList
 from GoogleCalendarAPI.createEvent import createEvent
@@ -19,13 +19,14 @@ from grouch.settingsReader import isSameCourse, setCourseName
 class GuiRunner:
     def __init__(self, root):
         self.root = root
-        self.root.geometry("1100x720+300+150")
+        self.root.geometry("1100x730+300+150")
         self.root.title("OSCAR To MSCalendar Converter")
         self.root.resizable(False, False)
         self.root.iconbitmap('tech-logo.ico')
         self.courseDescription = getCourseList()
         self.treeTable = NONE
         self.semester = ""
+        self.bottomLeftLabel = Label(self.root, text='', font=('Arial', 13))
         
         
         self.queryRow()
@@ -63,16 +64,19 @@ class GuiRunner:
         SpringSemester = Radiobutton(initFrame, text="Spring", variable=sem, value="02", font=("Arial", 13), command=lambda: sem.set("02"))
         SummerSemester = Radiobutton(initFrame, text="Summer", variable=sem, value="05", font=("Arial", 13), command=lambda: sem.set("05"))
         
-        getCourse = Button(self.root, text="Get Course", font=("Arial", 13), command=lambda: self.fetchCourse(courseName.get(), crn.get(), sem.get(), progress))
+        progress = ttk.Progressbar(self.root, orient=HORIZONTAL, length=300, mode='indeterminate')
+        progress['maximum'] = 100
 
+        getCourse = Button(self.root, text="Get Course", font=("Arial", 13), 
+                    command=lambda: Thread(target=self.fetchCourse, args=(courseName.get(), crn.get(), sem.get(), courseNumber.get(), progress, getCourse)).start())
+        #command=lambda: self.fetchCourse(courseName.get(), crn.get(), sem.get(), courseNumber.get(), progress)
         line1 = ttk.Separator(self.root, orient='horizontal')
 
         convert = Button(self.root, text="Convert to Calendar", font=("Arial", 13), bg="silver", command=self.selectToEvent)
 
         line2 = ttk.Separator(self.root, orient='horizontal')
         
-        progress = ttk.Progressbar(self.root, orient=HORIZONTAL, length=300, mode='indeterminate')
-        progress['maximum'] = 100
+        
         
 
         #Add object to windows
@@ -89,7 +93,9 @@ class GuiRunner:
         line1.grid(row=1, columnspan=3, sticky="ew", padx=30)
         convert.grid(row=3, columnspan=3)
         line2.grid(row=4, columnspan=3, sticky="ew", padx=30, pady=(20,10))
+        self.bottomLeftLabel.grid(row=5, column=0, sticky='w', padx=30)
         progress.grid(row=5, columnspan=3, sticky='e', padx=30)
+        
 
     def table(self):
         style = ttk.Style()
@@ -141,6 +147,15 @@ class GuiRunner:
         self.treeTable.tag_configure('evenrow', background='silver')
 
     def fillTable(self, courseList):
+        """Fill the treeview table in the gui
+
+        Args:
+            courseList (list): the list of course informations
+        """
+        # clear old table content
+        self.treeTable.delete(*self.treeTable.get_children())
+
+        # Fill table
         count=0
         for course in courseList:
             meet = course['meetings'][0]
@@ -167,34 +182,38 @@ class GuiRunner:
         # pass everything to create event
         #createEvent(values[0], values[6], values[5], self.semester, values[4])
 
-    def fetchCourse(self, courseName, crn, semDate, progress):
+    def fetchCourse(self, courseName, crn, semDate, courseNumber, progress, getCourseButton):
+        
+        self.bottomLeftLabel.config(text='Fetching Course Information ...')
 
         Stop_Thread = False
-        # progressThread = Thread(target=self.bar, args=(progress, lambda: Stop_Thread))
-        # progressThread.start()
+        progressThread = Thread(target=self.bar, args=(progress, lambda: Stop_Thread))
+        progressThread.daemon = True
+        progressThread.start()
 
         # set settings
         
         if not isSameCourse(courseName[:courseName.index(":")]):
             setCourseName(courseName[:courseName.index(":")])
-            print(courseName[:courseName.index(":")] + "LISSTTTT")
+            
             crawlerThread = Thread(target=crawlCourseJson)
+            
+            getCourseButton.config(state='disabled')
 
-            # if (crawlerThread.is_alive()):
-            #     crawlerThread.terminate()
-            #     crawlerThread.join()
             crawlerThread.start()
             crawlerThread.join()
 
+        getCourseButton.config(state='normal')
         Stop_Thread = True
-        # progressThread.join()
+        progressThread.join()
         
+        self.bottomLeftLabel.config(text='')
         
         # Fill table with the course
         if len(crn) < 5:
-            parser = jsonParser(courseName[:courseName.index(":")])
+            parser = jsonParser(courseName[:courseName.index(":")] + " " + courseNumber)
         else:
-            parser = jsonParser(courseName[:courseName.index(":")], crn)
+            parser = jsonParser(courseName[:courseName.index(":")] + " " + courseNumber, crn)
 
         try:
             courseElement, self.semester = parser.getCourseInformation(semDate)
@@ -202,23 +221,34 @@ class GuiRunner:
             messagebox.showerror("Error", "No course match the information you entered")
             return
 
-        print("filling table")
         self.fillTable(courseElement)
-        self.treeTable.update_idletasks()
+        #self.treeTable.update()
 
     def bar(self, progress, stop):
-        print("barrrrrrrrr")
+        """Method that moves the progress bar and finishes when scrapy finished crawling courses
+
+        Args:
+            progress (ProgressBar): an object of progress bar
+            stop (boolean): whether progress bar should be stopped. i.e. crawler has finished
+        """
+        while True:
         
-            
-        for i in range(100):
-            progress['value']+=1
-            self.root.update_idletasks()
-            time.sleep(0.2)
-            
-        for i in range(100):
-            progress['value']-=1
-            self.root.update_idletasks()
-            time.sleep(0.2)
+            for i in range(100):
+                progress['value']+=1
+                self.root.update_idletasks()
+                time.sleep(0.2)
+                if stop():
+                    break
+                
+            for i in range(100):
+                progress['value']-=1
+                self.root.update_idletasks()
+                time.sleep(0.2)
+                if stop():
+                    break
+            if stop():
+                progress['value'] = 0
+                break
         
 
 
