@@ -3,10 +3,10 @@ import os
 sys.path.append(os.getcwd())
 import time
 from multiprocessing import Process
-from threading import Thread
+from threading import Thread, Timer
 from tkinter import font, ttk, messagebox
 
-from grouch.spiders.oscar_spider import OscarSpider
+import grouch.spiders.oscar_spider as osp
 from multiprocessing import Process
 from tkinter import *
 from gui.courseDescription import getCourseList
@@ -14,7 +14,7 @@ from GoogleCalendarAPI.createEvent import createEvent
 from runner.crawlerRunner import crawlCourseJson
 from runner.jsonParser import jsonParser
 from grouch import settings
-from grouch.settingsReader import isSameCourse, setCourseName
+from grouch.settingsReader import *
 
 class GuiRunner:
     def __init__(self, root):
@@ -25,7 +25,7 @@ class GuiRunner:
         self.root.iconbitmap('tech-logo.ico')
         self.courseDescription = getCourseList()
         self.treeTable = NONE
-        self.semester = ""
+        #self.semester = ""
         self.bottomLeftLabel = Label(self.root, text='', font=('Arial', 13))
         
         
@@ -162,11 +162,11 @@ class GuiRunner:
             if count%2 == 0:
                 self.treeTable.insert(parent='', index='end', iid=count, text='', 
                                 value=(course['section_id'], course['crn'], ' ,'.join(meet['instructor']), 
-                                        "Dates", meet['days'], meet['time'], meet['location']), tags=('evenrow',))
+                                        meet['dateRange'], meet['days'], meet['time'], meet['location']), tags=('evenrow',))
             else:
                 self.treeTable.insert(parent='', index='end', iid=count, text='', 
                                 value=(course['section_id'], course['crn'], ' ,'.join(meet['instructor']), 
-                                        "Dates", meet['days'], meet['time'], meet['location']), tags=('oddrow',))
+                                        meet['dateRange'], meet['days'], meet['time'], meet['location']), tags=('oddrow',))
             count+=1
 
     def selectToEvent(self):
@@ -183,25 +183,35 @@ class GuiRunner:
         #createEvent(values[0], values[6], values[5], self.semester, values[4])
 
     def fetchCourse(self, courseName, crn, semDate, courseNumber, progress, getCourseButton):
-        
-        self.bottomLeftLabel.config(text='Fetching Course Information ...')
 
+        self.bottomLeftLabel.config(text='Fetching Course Information ...')
+        
         Stop_Thread = False
         progressThread = Thread(target=self.bar, args=(progress, lambda: Stop_Thread))
         progressThread.daemon = True
         progressThread.start()
 
         # set settings
+        if semDate == '05':
+            setParseLimit(2)
+        else:
+            setParseLimit(1)
         
-        if not isSameCourse(courseName[:courseName.index(":")]):
-            setCourseName(courseName[:courseName.index(":")])
-            
-            crawlerThread = Thread(target=crawlCourseJson)
-            
-            getCourseButton.config(state='disabled')
-
-            crawlerThread.start()
-            crawlerThread.join()
+        # if not isSameCourse(courseName[:courseName.index(":")]):
+        setCourseName(courseName[:courseName.index(":")])
+        courseIndetifier = courseName[:courseName.index(":")] + " " + courseNumber
+        setCourseIdentifier(courseIndetifier)
+        
+        crawlerThread = Thread(target=crawlCourseJson)
+        
+        getCourseButton.config(state='disabled')
+        
+        crawlerThread.start()
+        try:
+            scanFile = RepeatedTimer(1, self.scanFile, crn, courseName, courseNumber, semDate)
+        finally:
+            scanFile.stop()
+        crawlerThread.join()
 
         getCourseButton.config(state='normal')
         Stop_Thread = True
@@ -210,17 +220,18 @@ class GuiRunner:
         self.bottomLeftLabel.config(text='')
         
         # Fill table with the course
-        if len(crn) < 5:
-            parser = jsonParser(courseName[:courseName.index(":")] + " " + courseNumber)
-        else:
-            parser = jsonParser(courseName[:courseName.index(":")] + " " + courseNumber, crn)
+        
+        parser = jsonParser(courseIndetifier)
+        
 
+       
+        
         try:
-            courseElement, self.semester = parser.getCourseInformation(semDate)
-        except ValueError:
+            courseElement = parser.getCourseInformation(semDate)
+        except:
             messagebox.showerror("Error", "No course match the information you entered")
             return
-
+            
         self.fillTable(courseElement)
         #self.treeTable.update()
 
@@ -249,7 +260,48 @@ class GuiRunner:
             if stop():
                 progress['value'] = 0
                 break
-        
+    
+    def scanFile(self, crn, courseName, courseNumber, semDate):
+        # Fill table with the course
+        print("scanning ..........")
+        if len(crn) < 5:
+            parser = jsonParser(courseName[:courseName.index(":")] + " " + courseNumber)
+        else:
+            parser = jsonParser(courseName[:courseName.index(":")] + " " + courseNumber, crn)
+
+        try:
+            courseElement = parser.getCourseInformation(semDate)
+        except ValueError:
+            return
+        self.fillTable(courseElement)
+    
+
+class RepeatedTimer(object):
+  def __init__(self, interval, function, *args, **kwargs):
+    self._timer = None
+    self.interval = interval
+    self.function = function
+    self.args = args
+    self.kwargs = kwargs
+    self.is_running = False
+    self.next_call = time.time()
+    self.start()
+
+  def _run(self):
+    self.is_running = False
+    self.start()
+    self.function(*self.args, **self.kwargs)
+
+  def start(self):
+    if not self.is_running:
+      self.next_call += self.interval
+      self._timer = Timer(self.next_call - time.time(), self._run)
+      self._timer.start()
+      self.is_running = True
+
+  def stop(self):
+    self._timer.cancel()
+    self.is_running = False
 
 
         

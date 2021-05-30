@@ -3,9 +3,8 @@ import json
 
 class jsonParser:
   
-    def __init__(self, courseNum, crn=0):
+    def __init__(self, courseNum):
         self.courseNumber = courseNum
-        self.crn = str(crn)
 
     def getCourseInformation(self, semDate): 
         """Return Course Information that user requests
@@ -25,21 +24,17 @@ class jsonParser:
         course = json.load(f)
         courseInfo = list(filter(lambda x: x["identifier"] == self.courseNumber
                                  and semDate in x['semester'] , course))
+        # allClassInfo = list(filter(lambda x: self.courseNumber[0] in x["identifier"], course))
         
         if len(courseInfo) == 0:
             raise ValueError("No information is available")
 
         classList = courseInfo[0]["sections"]
-        semester = courseInfo[0]["semester"]
-
-        if not self.crn == 0:
-            for element in classList:
-                if element["crn"] == self.crn:
-                    return element, semester
-                
-            return classList, semester
-        else:
-            return classList, semester
+        # If user input the wrong information, it will display all possible options for user to choose
+        # allClassList = allClassInfo[0]["sections"]
+        #semester = courseInfo[0]["semester"]
+        
+        return classList
 
     # print(courseInfo[0]["crn"])
     #print(json.dumps(courseInfo, indent = 4))

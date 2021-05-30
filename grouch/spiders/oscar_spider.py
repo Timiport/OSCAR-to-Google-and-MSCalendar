@@ -7,7 +7,6 @@ import grouch
 from grouch import settings
 from grouch import items
 
-
 class OscarSpider(scrapy.Spider):
 
     name = "oscar"
@@ -67,6 +66,9 @@ class OscarSpider(scrapy.Spider):
         loader.add_css('hours', 'td.ntdefault', re=r'([\s\S]*?)<span')
         loader.add_css('identifier', 'td.nttitle::text', re=r'(.*?) -')
 
+        if (loader._values['identifier'][0] != grouch.settings.COURSE_IDENTIFIER):
+            return
+
         for field in loader._values['fields']:  # introspect the loader
             # wonky way to deal with adding the regex
             regex = r"{}.{}<\/span>([\S\s]*?)(?:<span|<\/td>)".format(field, "{0,5}")
@@ -111,9 +113,10 @@ class OscarSpider(scrapy.Spider):
             meet['time'] = blocks[1].css('td::text').extract()
             meet['days'] = blocks[2].css('td::text').extract()
             meet['location'] = blocks[3].css('td::text').extract()
+            meet['dateRange'] = blocks[4].css('td::text').extract()
             meet['type'] = blocks[5].css('td::text').extract()
 
-            for attr in ['time', 'days', 'location', 'type']:
+            for attr in ['time', 'days', 'location', 'dateRange', 'type']:
                 meet[attr] = meet[attr][0] if meet[attr] else None
                 meet[attr] = None if meet[attr] == u'\xa0' else meet[attr]
 

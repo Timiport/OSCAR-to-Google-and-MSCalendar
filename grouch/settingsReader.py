@@ -15,7 +15,6 @@ def setCourseName(courseName):
     fileLines = fil.readlines()
     
     fileLines[20] = f"SUBJECTS = [\'{courseName}\']\n" 
-    print(fileLines[20])
     fil = open(settingsFile, 'w')
     fil.writelines(fileLines)
     fil.close()
@@ -36,8 +35,34 @@ def isSameCourse(courseName):
     fil = open(settingsFile, 'r')
     fileLines = fil.readlines()
     oldCourse = fileLines[20][fileLines[20].index("'")+1: len(fileLines[20])-3]
-    
+    fil.close()
     if (oldCourse == courseName):
         return True
     else:
         return False
+
+def setParseLimit(limit):
+    """Method that set the parse term limit in 'settings.py'
+
+    Args:
+        limit (int): semester limit of crawler
+    """
+    fil = open(settingsFile, 'r')
+    fileLines = fil.readlines()
+    fileLines[17] = f'SEMESTER_STOP = {limit}\n'
+    fil = open(settingsFile, 'w')
+    fil.writelines(fileLines)
+    fil.close()
+
+def setCourseIdentifier(identifier):
+    """Set course identifier to allow for faster processing
+
+    Args:
+        identifier (string): course identifier. ie. 'CS 1332'
+    """
+    fil = open(settingsFile, 'r')
+    fileLines = fil.readlines()
+    fileLines[22] = f'COURSE_IDENTIFIER = \'{identifier}\'\n'
+    fil = open(settingsFile, 'w')
+    fil.writelines(fileLines)
+    fil.close()
