@@ -68,7 +68,7 @@ class GuiRunner:
         progress['maximum'] = 100
 
         getCourse = Button(self.root, text="Get Course", font=("Arial", 13), 
-                    command=lambda: Thread(target=self.fetchCourse, args=(courseName.get(), crn.get(), sem.get(), courseNumber.get(), progress, getCourse)).start())
+                    command=lambda: Thread(target=self.fetchCourse, args=(courseName.get(), sem.get(), courseNumber.get(), progress, getCourse)).start())
         #command=lambda: self.fetchCourse(courseName.get(), crn.get(), sem.get(), courseNumber.get(), progress)
         line1 = ttk.Separator(self.root, orient='horizontal')
 
@@ -182,7 +182,7 @@ class GuiRunner:
         # pass everything to create event
         #createEvent(values[0], values[6], values[5], self.semester, values[4])
 
-    def fetchCourse(self, courseName, crn, semDate, courseNumber, progress, getCourseButton):
+    def fetchCourse(self, courseName, semDate, courseNumber, progress, getCourseButton):
 
         self.bottomLeftLabel.config(text='Fetching Course Information ...')
         
@@ -200,18 +200,20 @@ class GuiRunner:
         # if not isSameCourse(courseName[:courseName.index(":")]):
         setCourseName(courseName[:courseName.index(":")])
         courseIndetifier = courseName[:courseName.index(":")] + " " + courseNumber
-        setCourseIdentifier(courseIndetifier)
+        setCourseIdentifier(courseNumber)
         
         crawlerThread = Thread(target=crawlCourseJson)
         
         getCourseButton.config(state='disabled')
         
         crawlerThread.start()
-        try:
-            scanFile = RepeatedTimer(1, self.scanFile, crn, courseName, courseNumber, semDate)
-        finally:
-            scanFile.stop()
+       
+        # scan = self.call_repeatedly(1, self.scanFile, courseName, courseNumber, semDate)
+        
+       
+
         crawlerThread.join()
+        
 
         getCourseButton.config(state='normal')
         Stop_Thread = True
@@ -223,8 +225,6 @@ class GuiRunner:
         
         parser = jsonParser(courseIndetifier)
         
-
-       
         
         try:
             courseElement = parser.getCourseInformation(semDate)
@@ -261,47 +261,3 @@ class GuiRunner:
                 progress['value'] = 0
                 break
     
-    def scanFile(self, crn, courseName, courseNumber, semDate):
-        # Fill table with the course
-        print("scanning ..........")
-        if len(crn) < 5:
-            parser = jsonParser(courseName[:courseName.index(":")] + " " + courseNumber)
-        else:
-            parser = jsonParser(courseName[:courseName.index(":")] + " " + courseNumber, crn)
-
-        try:
-            courseElement = parser.getCourseInformation(semDate)
-        except ValueError:
-            return
-        self.fillTable(courseElement)
-    
-
-class RepeatedTimer(object):
-  def __init__(self, interval, function, *args, **kwargs):
-    self._timer = None
-    self.interval = interval
-    self.function = function
-    self.args = args
-    self.kwargs = kwargs
-    self.is_running = False
-    self.next_call = time.time()
-    self.start()
-
-  def _run(self):
-    self.is_running = False
-    self.start()
-    self.function(*self.args, **self.kwargs)
-
-  def start(self):
-    if not self.is_running:
-      self.next_call += self.interval
-      self._timer = Timer(self.next_call - time.time(), self._run)
-      self._timer.start()
-      self.is_running = True
-
-  def stop(self):
-    self._timer.cancel()
-    self.is_running = False
-
-
-        

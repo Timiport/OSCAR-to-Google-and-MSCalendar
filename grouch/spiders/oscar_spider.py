@@ -52,7 +52,9 @@ class OscarSpider(scrapy.Spider):
         urls = response.css("td.nttitle a::attr(href)").re(".*detail.*")
         # only pulls urls for course pages
         for url in urls:
-            yield scrapy.Request(self.base+url, self.parse_detail)
+            # Optimize crawler speed
+            if "crse_numb_in=" + settings.COURSE_IDENTIFIER in str(url):
+                yield scrapy.Request(self.base+url, self.parse_detail)
 
     def parse_detail(self, response):
         loader = CourseLoader(item=items.Course(), response=response)
@@ -66,8 +68,6 @@ class OscarSpider(scrapy.Spider):
         loader.add_css('hours', 'td.ntdefault', re=r'([\s\S]*?)<span')
         loader.add_css('identifier', 'td.nttitle::text', re=r'(.*?) -')
 
-        if (loader._values['identifier'][0] != grouch.settings.COURSE_IDENTIFIER):
-            return
 
         for field in loader._values['fields']:  # introspect the loader
             # wonky way to deal with adding the regex
