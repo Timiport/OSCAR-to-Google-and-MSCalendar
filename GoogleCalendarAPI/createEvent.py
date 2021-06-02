@@ -11,7 +11,6 @@ def createEvent(subject, location, time, semester, weekDays):
     endTime = getTime(time[time.index("-")+2:], semester)
     weeksList = getWeek(weekDays)
     weeks = ','.join(weeksList)
-    print(weeks)
     event = {
         'summary': subject,
         'location': location,

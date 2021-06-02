@@ -1,3 +1,4 @@
+import enum
 import sys
 import os
 sys.path.append(os.getcwd())
@@ -5,6 +6,7 @@ import time
 from multiprocessing import Process
 from threading import Thread, Timer
 from tkinter import font, ttk, messagebox
+from string import ascii_uppercase
 
 import grouch.spiders.oscar_spider as osp
 from multiprocessing import Process
@@ -25,6 +27,7 @@ class GuiRunner:
         self.root.iconbitmap('tech-logo.ico')
         self.courseDescription = getCourseList()
         self.treeTable = NONE
+        # self.courseDropDown = NONE
         #self.semester = ""
         self.bottomLeftLabel = Label(self.root, text='', font=('Arial', 13))
         
@@ -39,16 +42,23 @@ class GuiRunner:
         courseName = StringVar()
         courseName.set(self.courseDescription[0])
 
-        courseDropDown = OptionMenu(initFrame, courseName, *self.courseDescription)
+        # courseDropDown = OptionMenu(initFrame, courseName, *self.courseDescription)
         courseDropDown = ttk.Combobox(initFrame, textvariable=courseName, values=self.courseDescription, 
                                         width=15, height=15, font=("Arial", 13))
+        # self.courseDropDown.bind("<Key>", self.findCourseInDropDown)
+        def on_click_delete(event):
+            event.widget.delete(0, END)
+
+        # courseDropDown = AutocompleteCombobox(initFrame)
+        # courseDropDown.set_completion_list(self.courseDescription)
+        # courseDropDown.bind("<Button-1>", on_click_delete)
+
         courseNumLabel = Label(initFrame, text="Course Number: ", font=("Arial", 13))
         defaultText = StringVar()
         defaultText.set("Ex: 1332")
         courseNumber = Entry(initFrame, width=15, font=("Arial", 13), textvariable=defaultText)
         
-        def on_click_delete(event):
-            event.widget.delete(0, END)
+       
         
         courseNumber.bind("<Button-1>", on_click_delete)
 
@@ -80,16 +90,16 @@ class GuiRunner:
         
 
         #Add object to windows
-        initFrame.grid(row=0, column=0, padx=20, pady=20)
+        initFrame.grid(row=0, column=0, padx=(20,0), pady=20)
         courseDropDown.grid(row=0, column=0, padx=20, pady=20)
-        courseNumLabel.grid(row=0,column=1)
+        courseNumLabel.grid(row=0,column=1, padx=(50,0))
         courseNumber.grid(row=0,column=2)
-        crnText.grid(row=0, column=3, padx=(20,0))
-        crn.grid(row=0, column=4)
-        fallSemester.grid(row=0,column=5, padx=(20,0))
+        # crnText.grid(row=0, column=3, padx=(20,0))
+        # crn.grid(row=0, column=4)
+        fallSemester.grid(row=0,column=5, padx=(50,0))
         SpringSemester.grid(row=0, column=6)
         SummerSemester.grid(row=0, column=7, padx=(0, 20))
-        getCourse.grid(row=0, column=2, padx=(5,20))
+        getCourse.grid(row=0, column=1, padx=(5,20))
         line1.grid(row=1, columnspan=3, sticky="ew", padx=30)
         convert.grid(row=3, columnspan=3)
         line2.grid(row=4, columnspan=3, sticky="ew", padx=30, pady=(20,10))
@@ -110,7 +120,7 @@ class GuiRunner:
         style.map('Treeview', 
                     background=[('selected', "#347083")])
         treeFrame = Frame(self.root)
-        treeFrame.grid(row=2, columnspan=3, pady=20)
+        treeFrame.grid(row=2, columnspan=3, pady=20, padx=40)
 
         treeScrollBar = Scrollbar(treeFrame)
         treeScrollBar.pack(side=RIGHT, fill=Y)
@@ -146,6 +156,16 @@ class GuiRunner:
         self.treeTable.tag_configure('oddrow', background="white")
         self.treeTable.tag_configure('evenrow', background='silver')
 
+    def findCourseInDropDown(self, event):
+        keyPress = event.char.upper()
+
+        if keyPress in ascii_uppercase:
+            for index, course in enumerate(self.courseDescription):
+                if course[0] >= keyPress:
+                    self.courseDropDown.current(index)
+                    break
+
+
     def fillTable(self, courseList):
         """Fill the treeview table in the gui
 
@@ -154,20 +174,21 @@ class GuiRunner:
         """
         # clear old table content
         self.treeTable.delete(*self.treeTable.get_children())
-
+        
         # Fill table
         count=0
         for course in courseList:
-            meet = course['meetings'][0]
-            if count%2 == 0:
-                self.treeTable.insert(parent='', index='end', iid=count, text='', 
-                                value=(course['section_id'], course['crn'], ' ,'.join(meet['instructor']), 
-                                        meet['dateRange'], meet['days'], meet['time'], meet['location']), tags=('evenrow',))
-            else:
-                self.treeTable.insert(parent='', index='end', iid=count, text='', 
-                                value=(course['section_id'], course['crn'], ' ,'.join(meet['instructor']), 
-                                        meet['dateRange'], meet['days'], meet['time'], meet['location']), tags=('oddrow',))
-            count+=1
+            for sections in course:
+                meet = sections['meetings'][0]
+                if count%2 == 0:
+                    self.treeTable.insert(parent='', index='end', iid=count, text='', 
+                                    value=(sections['section_id'], sections['crn'], ' ,'.join(meet['instructor']), 
+                                            meet['dateRange'], meet['days'], meet['time'], meet['location']), tags=('evenrow',))
+                else:
+                    self.treeTable.insert(parent='', index='end', iid=count, text='', 
+                                    value=(sections['section_id'], sections['crn'], ' ,'.join(meet['instructor']), 
+                                            meet['dateRange'], meet['days'], meet['time'], meet['location']), tags=('oddrow',))
+                count+=1
 
     def selectToEvent(self):
         # Grab selected numbers
@@ -180,7 +201,9 @@ class GuiRunner:
             messagebox.showerror("Error", "No course selected")
             return
         # pass everything to create event
-        #createEvent(values[0], values[6], values[5], self.semester, values[4])
+        courseSubject = settings.SUBJECTS[0] + " " + settings.COURSE_IDENTIFIER + " "
+
+        createEvent(values[0], values[6], values[5], self.semester, values[4])
 
     def fetchCourse(self, courseName, semDate, courseNumber, progress, getCourseButton):
 
@@ -192,25 +215,22 @@ class GuiRunner:
         progressThread.start()
 
         # set settings
-        if semDate == '05':
-            setParseLimit(2)
-        else:
-            setParseLimit(1)
-        
-        # if not isSameCourse(courseName[:courseName.index(":")]):
-        setCourseName(courseName[:courseName.index(":")])
+        # if semDate == '05':
+        #     setParseLimit(2)
+        # else:
+        #     setParseLimit(2)
         courseIndetifier = courseName[:courseName.index(":")] + " " + courseNumber
-        setCourseIdentifier(courseNumber)
         
+        
+        setCourseName(courseName[:courseName.index(":")])
+        
+        setCourseIdentifier(courseNumber)
+    
         crawlerThread = Thread(target=crawlCourseJson)
         
         getCourseButton.config(state='disabled')
         
-        crawlerThread.start()
-       
-        # scan = self.call_repeatedly(1, self.scanFile, courseName, courseNumber, semDate)
-        
-       
+        crawlerThread.start() 
 
         crawlerThread.join()
         

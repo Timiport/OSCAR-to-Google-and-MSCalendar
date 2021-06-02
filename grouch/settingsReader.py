@@ -1,5 +1,5 @@
 from pathlib import Path
-
+from grouch import settings
 folder = Path('grouch')
 settingsFile = folder / 'settings.py'
 
@@ -32,10 +32,12 @@ def isSameCourse(courseName):
         boolean: whether the course is same or not
     """
 
-    fil = open(settingsFile, 'r')
-    fileLines = fil.readlines()
-    oldCourse = fileLines[20][fileLines[20].index("'")+1: len(fileLines[20])-3]
-    fil.close()
+    # fil = open(settingsFile, 'r')
+    # fileLines = fil.readlines()
+    # oldCourse = fileLines[22]
+    # fil.close()
+    oldCourse = settings.SUBJECTS[0] + " " + settings.COURSE_IDENTIFIER
+   
     if (oldCourse == courseName):
         return True
     else:
