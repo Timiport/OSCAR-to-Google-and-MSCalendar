@@ -1,4 +1,3 @@
-import enum
 import sys
 import os
 sys.path.append(os.getcwd())
@@ -7,6 +6,7 @@ from multiprocessing import Process
 from threading import Thread, Timer
 from tkinter import font, ttk, messagebox
 from string import ascii_uppercase
+from GoogleCalendarAPI.authenticate import getCalendarService
 
 import grouch.spiders.oscar_spider as osp
 from multiprocessing import Process
@@ -17,6 +17,7 @@ from runner.crawlerRunner import crawlCourseJson
 from runner.jsonParser import jsonParser
 from grouch import settings
 from grouch.settingsReader import *
+from PIL import Image, ImageTk
 
 class GuiRunner:
     def __init__(self, root):
@@ -30,8 +31,9 @@ class GuiRunner:
         # self.courseDropDown = NONE
         #self.semester = ""
         self.bottomLeftLabel = Label(self.root, text='', font=('Arial', 13))
+        self.calendarService = None
         
-        
+        self.loginWindow()
         self.queryRow()
         self.table()
 
@@ -281,3 +283,35 @@ class GuiRunner:
                 progress['value'] = 0
                 break
     
+    def loginWindow(self):
+        login_Window = Toplevel(self.root)
+        login_Window.geometry("400x210+500+350")
+        login_Window.title("Login Calendar")
+        login_Window.resizable(False, False)
+        login_Window.iconbitmap('tech-logo.ico')
+        login_Window.configure(background='grey')
+        self.loginCalendar(login_Window)
+
+    def loginCalendar(self, window):
+
+        global msPhotoImage, msImage, googleImage, googlePhotoImage
+        googleImage = Image.open('gui/icon/google.jpg')
+        googleImage = googleImage.resize((100, 100), Image.ANTIALIAS)
+        googlePhotoImage = ImageTk.PhotoImage(googleImage)
+
+        msImage = Image.open('gui/icon/microsoft.png')
+        msImage = msImage.resize((100,100), Image.ANTIALIAS)
+        msPhotoImage = ImageTk.PhotoImage(msImage)
+
+        upperButton = Button(window, text= 'Google Calendar', image=googlePhotoImage, compound='left', 
+                                font=('Arial', 13), width=400, height=90, padx=100)
+
+        lowerButton = Button(window, text= 'Microsoft Calendar', image=msPhotoImage, compound='left', 
+                                font=('Arial', 13), width=400, height=90, padx=100)
+
+
+        upperButton.pack(pady=(5,5))
+        lowerButton.pack()
+    
+    def launchGoogleCalendar(self):
+        self.calendarService = getCalendarService()
