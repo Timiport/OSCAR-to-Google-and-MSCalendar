@@ -5,6 +5,7 @@ from tkinter import Tk
 from GoogleCalendarAPI import createEvent
 from runner.jsonParser import jsonParser
 from gui.startWindows import GuiRunner
+from gui.loginScreen import loginScreen
 
 def main():
     
@@ -12,7 +13,8 @@ def main():
     # courseElement, semester = parser.getCourseInformation("08")
     #print(courseElement)
     window = Tk()
-    gui = GuiRunner(window)
+    GuiRunner(window)
+    # gui = GuiRunner(window)
     # gui.fillTable(courseElement)
     window.mainloop()   
     #print(semester)

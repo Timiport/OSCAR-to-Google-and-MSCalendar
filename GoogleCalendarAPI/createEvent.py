@@ -27,7 +27,7 @@ def createEvent(subject, location, time, semester, weekDays):
         ],
     }
     #print('RRULE:FREQ=WEEKLY;UNTIL=20211010;BYDATE=' + str(weeks))
-    event = service.events().insert(calendarId='primary', body=event).execute()
+    # event = service.events().insert(calendarId='primary', body=event).execute()
 
 def getTime(time, semester):
     """Method to generate the time based on course time and semester
