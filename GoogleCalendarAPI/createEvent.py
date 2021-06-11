@@ -16,6 +16,8 @@ def createEvent(subject, location, time, semester, weekDays):
         semester (string): date range of the event
         weekDays (string): weekdays the event occurs
     """
+    if time == "None":
+        raise ValueError("Can not create event with insufficient course information")
 
     service = getCalendarService()
     startDate, endDate = getDate(semester)
@@ -39,7 +41,6 @@ def createEvent(subject, location, time, semester, weekDays):
         ],
     }
     #print('RRULE:FREQ=WEEKLY;UNTIL=20211010;BYDATE=' + str(weeks))
-    print(subject)
     event = service.events().insert(calendarId='primary', body=event).execute()
 
 def getDate(dateRange):

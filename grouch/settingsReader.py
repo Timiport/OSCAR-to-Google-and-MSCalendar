@@ -1,9 +1,4 @@
 from pathlib import Path
-import sys
-import os
-from types import ModuleType
-from webbrowser import get
-sys.path.append(os.getcwd())
 from grouch import settings
 folder = Path('grouch')
 settingsFile = folder / 'settings.py'
