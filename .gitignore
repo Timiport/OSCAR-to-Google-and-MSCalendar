@@ -12,6 +12,7 @@ __pycache__/
 # custom file
 token.json
 result.json
+log.txt
 
 # Distribution / packaging
 .Python

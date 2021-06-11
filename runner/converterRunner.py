@@ -17,12 +17,7 @@ def main():
     # gui = GuiRunner(window)
     # gui.fillTable(courseElement)
     window.mainloop()   
-    #print(semester)
-    # time = courseElement['meetings'][0]['time']
-    # location = courseElement['meetings'][0]['location']
-    # weekDays = courseElement['meetings'][0]['days']
-    # instructor = courseElement['meetings'][0]['instructor']
-    #createEvent.createEvent("CS 1334", location, time, semester, weekDays)
+    
     
 
 if __name__ == "__main__":

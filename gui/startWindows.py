@@ -1,7 +1,10 @@
+from inspect import Traceback
 import sys
 import os
 sys.path.append(os.getcwd())
 import time
+import logging
+import traceback
 from multiprocessing import Process
 from threading import Thread, Timer
 from tkinter import font, ttk, messagebox
@@ -203,9 +206,20 @@ class GuiRunner:
             messagebox.showerror("Error", "No course selected")
             return
         # pass everything to create event
-        courseSubject = settings.SUBJECTS[0] + " " + settings.COURSE_IDENTIFIER + " "
+        courseSubject = getCourseName()
+        
+        logging.basicConfig(filename='log.txt', level=logging.DEBUG, 
+                    format='%(asctime)s %(levelname)s %(name)s %(message)s')
+        
+        try:
+            createEvent(courseSubject, values[6], values[5], values[3], values[4])
+        except Exception as e:
+            messagebox.showinfo('Status', 'Error, please look into log.txt file')
+            logging.error(traceback.format_exc())
+            return
 
-        createEvent(values[0], values[6], values[5], self.semester, values[4])
+        messagebox.showinfo('Status', 'Done, course added to calendar')
+        
 
     def fetchCourse(self, courseName, semDate, courseNumber, progress, getCourseButton):
 
@@ -304,7 +318,7 @@ class GuiRunner:
         msPhotoImage = ImageTk.PhotoImage(msImage)
 
         upperButton = Button(window, text= 'Google Calendar', image=googlePhotoImage, compound='left', 
-                                font=('Arial', 13), width=400, height=90, padx=100)
+                                font=('Arial', 13), width=400, height=90, padx=100, command=lambda: self.launchGoogleCalendar(window))
 
         lowerButton = Button(window, text= 'Microsoft Calendar', image=msPhotoImage, compound='left', 
                                 font=('Arial', 13), width=400, height=90, padx=100)
@@ -313,5 +327,10 @@ class GuiRunner:
         upperButton.pack(pady=(5,5))
         lowerButton.pack()
     
-    def launchGoogleCalendar(self):
+    def launchGoogleCalendar(self, topWindow):
         self.calendarService = getCalendarService()
+        if self.calendarService != None:
+            messagebox.showinfo('Status', "Log in Successful.")
+            topWindow.destroy()
+        else:
+            messagebox.showinfo('Status', 'Log in Unccessful.')

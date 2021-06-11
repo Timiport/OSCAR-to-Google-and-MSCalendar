@@ -18,9 +18,9 @@ NEWSPIDER_MODULE = 'grouch.spiders'
 SEMESTER_STOP = 3
 
 # empty for all of them
-SUBJECTS = ['APPH']
+SUBJECTS = ['ACCT']
 SEMESTER_ACCEPT = ("02", "08", "05")  # Has to be a tuple
-COURSE_IDENTIFIER = '1050'
+COURSE_IDENTIFIER = '2102'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'grouch (+http://www.yourdomain.com)'

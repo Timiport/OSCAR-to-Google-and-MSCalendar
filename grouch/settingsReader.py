@@ -1,4 +1,9 @@
 from pathlib import Path
+import sys
+import os
+from types import ModuleType
+from webbrowser import get
+sys.path.append(os.getcwd())
 from grouch import settings
 folder = Path('grouch')
 settingsFile = folder / 'settings.py'
@@ -68,3 +73,13 @@ def setCourseIdentifier(identifier):
     fil = open(settingsFile, 'w')
     fil.writelines(fileLines)
     fil.close()
+
+def getCourseName():
+    fil = open(settingsFile, 'r')
+    fileLines = fil.readlines()
+    fileSubject = fileLines[20]
+    subject = fileSubject[fileSubject.index("'")+1:fileSubject.index("'", fileSubject.index("'")+1)]
+    fileIndetifier = fileLines[22]
+    identifier = fileIndetifier[fileIndetifier.index("'")+1: fileIndetifier.index("'",fileIndetifier.index("'")+1)]
+
+    return subject + " " + identifier
