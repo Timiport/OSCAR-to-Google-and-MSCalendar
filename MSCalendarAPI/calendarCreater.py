@@ -18,6 +18,11 @@ class MSCalendar:
         self.protocal = MSGraphProtocol()
 
     def userAuthentication(self):
+        """Authenticate user and launch a sign in page
+
+        Returns:
+            bool: true if the user is already authenticated false otherwise
+        """
         
         # authenticate account
         # if (account.authenticate(scopes=['calendar_all'])):
@@ -26,8 +31,10 @@ class MSCalendar:
         if not self.account.is_authenticated:    
             authURL = self.connect.get_authorization_url(self.protocal.get_scopes_for(['calendar_all']))
             webbrowser.open(authURL[0], new=1)
-            authrized = input("Authorization URL: ")
-            print(self.connect.request_token(authrized))
+            
+            return False
+        else:
+            return True
 
     def createEvent(self, subject, location, semester, time, weekday, reminderTime = 0):
         """
@@ -65,6 +72,9 @@ class MSCalendar:
 
         # newEvent.recurrence.set_weekly(len(weekday), days_of_week=week[0], first_day_of_week=week, end=dt.datetime(int(semester[:4]), 10, 10))
         print(newEvent.save())
+
+    def isAuthenticated(self):
+        return self.account.is_authenticated
 
     def getTime(self, time, semester):
         """Method to generate the time based on course time and semester

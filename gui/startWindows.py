@@ -9,13 +9,15 @@ from multiprocessing import Process
 from threading import Thread, Timer
 from tkinter import font, ttk, messagebox
 from string import ascii_uppercase
-from GoogleCalendarAPI.authenticate import getCalendarService
 
+from GoogleCalendarAPI.authenticate import getCalendarService
+from GoogleCalendarAPI.createEvent import createEvent
+from MSCalendarAPI.calendarCreater import MSCalendar
 import grouch.spiders.oscar_spider as osp
 from multiprocessing import Process
 from tkinter import *
 from gui.courseDescription import getCourseList
-from GoogleCalendarAPI.createEvent import createEvent
+
 from runner.crawlerRunner import crawlCourseJson
 from runner.jsonParser import jsonParser
 from grouch import settings
@@ -30,11 +32,10 @@ class GuiRunner:
         self.root.resizable(False, False)
         self.root.iconbitmap('tech-logo.ico')
         self.courseDescription = getCourseList()
-        self.treeTable = NONE
-        # self.courseDropDown = NONE
-        #self.semester = ""
+        self.treeTable = None
         self.bottomLeftLabel = Label(self.root, text='', font=('Arial', 13))
-        self.calendarService = None
+        self.GoogleCalendarService = None
+        self.MSCalendarService = None
         
         self.loginWindow()
         self.queryRow()
@@ -61,13 +62,10 @@ class GuiRunner:
         courseNumLabel = Label(initFrame, text="Course Number: ", font=("Arial", 13))
         defaultText = StringVar()
         defaultText.set("Ex: 1332")
-        courseNumber = Entry(initFrame, width=15, font=("Arial", 13), textvariable=defaultText)
-        
-       
-        
+        courseNumber = Entry(initFrame, width=15, font=("Arial", 13), textvariable=defaultText)     
+              
         courseNumber.bind("<Button-1>", on_click_delete)
 
-        crnText = Label(initFrame, text="CRN: ", font=("Arial", 13))
         optionalText = StringVar()
         optionalText.set("Optional")
         crn = Entry(initFrame, width=15, font=("Arial", 13), textvariable=optionalText, fg="grey")
@@ -89,18 +87,14 @@ class GuiRunner:
 
         convert = Button(self.root, text="Convert to Calendar", font=("Arial", 13), bg="silver", command=self.selectToEvent)
 
-        line2 = ttk.Separator(self.root, orient='horizontal')
-        
-        
-        
+        line2 = ttk.Separator(self.root, orient='horizontal') 
 
         #Add object to windows
         initFrame.grid(row=0, column=0, padx=(20,0), pady=20)
         courseDropDown.grid(row=0, column=0, padx=20, pady=20)
         courseNumLabel.grid(row=0,column=1, padx=(50,0))
         courseNumber.grid(row=0,column=2)
-        # crnText.grid(row=0, column=3, padx=(20,0))
-        # crn.grid(row=0, column=4)
+ 
         fallSemester.grid(row=0,column=5, padx=(50,0))
         SpringSemester.grid(row=0, column=6)
         SummerSemester.grid(row=0, column=7, padx=(0, 20))
@@ -235,19 +229,13 @@ class GuiRunner:
         #     setParseLimit(2)
         # else:
         #     setParseLimit(2)
-        courseIndetifier = courseName[:courseName.index(":")] + " " + courseNumber
-        
-        
-        setCourseName(courseName[:courseName.index(":")])
-        
+        courseIndetifier = courseName[:courseName.index(":")] + " " + courseNumber        
+        setCourseName(courseName[:courseName.index(":")])      
         setCourseIdentifier(courseNumber)
     
-        crawlerThread = Thread(target=crawlCourseJson)
-        
-        getCourseButton.config(state='disabled')
-        
+        crawlerThread = Thread(target=crawlCourseJson)      
+        getCourseButton.config(state='disabled')       
         crawlerThread.start() 
-
         crawlerThread.join()
         
 
@@ -303,13 +291,13 @@ class GuiRunner:
         login_Window.title("Login Calendar")
         login_Window.resizable(False, False)
         login_Window.iconbitmap('tech-logo.ico')
-        login_Window.configure(background='grey')
+        login_Window.configure(background='silver')
         self.loginCalendar(login_Window)
 
     def loginCalendar(self, window):
 
         global msPhotoImage, msImage, googleImage, googlePhotoImage
-        googleImage = Image.open('gui/icon/google.jpg')
+        googleImage = Image.open('gui/icon/google.png')
         googleImage = googleImage.resize((100, 100), Image.ANTIALIAS)
         googlePhotoImage = ImageTk.PhotoImage(googleImage)
 
@@ -321,16 +309,40 @@ class GuiRunner:
                                 font=('Arial', 13), width=400, height=90, padx=100, command=lambda: self.launchGoogleCalendar(window))
 
         lowerButton = Button(window, text= 'Microsoft Calendar', image=msPhotoImage, compound='left', 
-                                font=('Arial', 13), width=400, height=90, padx=100)
+                                font=('Arial', 13), width=400, height=90, padx=100, command=lambda: self.launchMSCalendar(window))
 
 
-        upperButton.pack(pady=(5,5))
-        lowerButton.pack()
+        upperButton.pack(pady=(5,5), padx=5)
+        lowerButton.pack(padx=5)
     
     def launchGoogleCalendar(self, topWindow):
-        self.calendarService = getCalendarService()
-        if self.calendarService != None:
+        self.GoogleCalendarService = getCalendarService()
+        if self.GoogleCalendarService != None:
             messagebox.showinfo('Status', "Log in Successful.")
             topWindow.destroy()
         else:
             messagebox.showinfo('Status', 'Log in Unccessful.')
+            self.loginWindow()
+
+    def launchMSCalendar(self, topWindow):
+        self.MSCalendarService = MSCalendar()
+        topWindow.destroy()
+        if (self.MSCalendarService.userAuthentication()):
+            messagebox.showinfo('Status', "Log in Successful.")
+        else:
+            # Create url window
+            auth_Window = Toplevel()
+            auth_Window.geometry("500x70+500+350")
+            auth_Window.title("Authorization URL")
+            auth_Window.resizable(False, False)
+            auth_Window.iconbitmap('tech-logo.ico')
+
+            text = Label(auth_Window, text="Please paste the auto generated url here after you logged in", font=("Arial", 13))
+            auth_URL = StringVar()
+            auth_Entry = Entry(auth_Window, textvariable=auth_URL, width=45, font=("Arial", 13))
+            verifyButton = Button(auth_Window, text='Verify', font=("Arial", 13))
+
+            text.grid(row=0, columnspan=2, sticky='w', pady=(5,0), padx=10)
+            auth_Entry.grid(row=1, column=0, padx=5, pady=5)
+            verifyButton.grid(row=1, column=1, padx=5)
+            # print(self.connect.request_token(authURl))
