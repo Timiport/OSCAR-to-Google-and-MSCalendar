@@ -321,8 +321,7 @@ class GuiRunner:
             messagebox.showinfo('Status', "Log in Successful.")
             topWindow.destroy()
         else:
-            messagebox.showinfo('Status', 'Log in Unccessful.')
-            self.loginWindow()
+            self.restartWindow()
 
     def launchMSCalendar(self, topWindow):
         self.MSCalendarService = MSCalendar()
@@ -340,9 +339,35 @@ class GuiRunner:
             text = Label(auth_Window, text="Please paste the auto generated url here after you logged in", font=("Arial", 13))
             auth_URL = StringVar()
             auth_Entry = Entry(auth_Window, textvariable=auth_URL, width=45, font=("Arial", 13))
-            verifyButton = Button(auth_Window, text='Verify', font=("Arial", 13))
+            verifyButton = Button(auth_Window, text='Verify', font=("Arial", 13), command=lambda: verify(auth_URL.get()))
 
             text.grid(row=0, columnspan=2, sticky='w', pady=(5,0), padx=10)
             auth_Entry.grid(row=1, column=0, padx=5, pady=5)
             verifyButton.grid(row=1, column=1, padx=5)
+            def verify(verifiedURL):
+                self.MSCalendarService.connect.request_token(verifiedURL)
+                auth_Window.destroy()
+                if self.MSCalendarService.account.is_authenticated:
+                    messagebox.showinfo('Status', 'Log in Succeessful')
+                else:
+                    self.restartWindow()
             # print(self.connect.request_token(authURl))
+
+    def restartWindow(self):
+        restart_window = Toplevel()
+        restart_window.geometry("200x80+500+350")
+        restart_window.title("Status")
+        restart_window.resizable(False, False)
+        restart_window.iconbitmap('tech-logo.ico')
+
+        def restart():
+            self.loginWindow()
+            restart_window.destroy()
+        
+        message = Label(restart_window, text='Log in Uncessful', font=('Arial', 13))
+        button = Button(restart_window, text='OK', font=("Arial", 13), command=restart)
+
+        message.pack(pady=(5,10))
+        button.pack(pady=(0,5))
+
+        

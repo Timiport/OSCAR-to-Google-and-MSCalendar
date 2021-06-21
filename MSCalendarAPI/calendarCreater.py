@@ -30,7 +30,7 @@ class MSCalendar:
 
         if not self.account.is_authenticated:    
             authURL = self.connect.get_authorization_url(self.protocal.get_scopes_for(['calendar_all']))
-            webbrowser.open(authURL[0], new=1)
+            webbrowser.open(authURL[0], new=0)
             
             return False
         else:

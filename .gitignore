@@ -13,6 +13,7 @@ __pycache__/
 token.json
 result.json
 log.txt
+o365_token.txt
 
 # Distribution / packaging
 .Python
