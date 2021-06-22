@@ -14,7 +14,7 @@ class loginScreen:
         self.root.geometry("400x210+500+350")
         self.root.title("Login Calendar")
         self.root.resizable(False, False)
-        self.root.iconbitmap('tech-logo.ico')
+        self.root.iconbitmap('gui/icon/tech-logo.ico')
         self.root.configure(background='grey')
         self.loginCalendar()
         

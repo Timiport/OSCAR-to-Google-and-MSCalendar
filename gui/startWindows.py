@@ -30,7 +30,7 @@ class GuiRunner:
         self.root.geometry("1100x730+300+150")
         self.root.title("OSCAR To MSCalendar Converter")
         self.root.resizable(False, False)
-        self.root.iconbitmap('tech-logo.ico')
+        self.root.iconbitmap('gui/icon/tech-logo.ico')
         self.courseDescription = getCourseList()
         self.treeTable = None
         self.bottomLeftLabel = Label(self.root, text='', font=('Arial', 13))
@@ -290,7 +290,7 @@ class GuiRunner:
         login_Window.geometry("400x210+500+350")
         login_Window.title("Login Calendar")
         login_Window.resizable(False, False)
-        login_Window.iconbitmap('tech-logo.ico')
+        login_Window.iconbitmap('gui/icon/tech-logo.ico')
         login_Window.configure(background='silver')
         self.loginCalendar(login_Window)
 
@@ -334,7 +334,7 @@ class GuiRunner:
             auth_Window.geometry("500x70+500+350")
             auth_Window.title("Authorization URL")
             auth_Window.resizable(False, False)
-            auth_Window.iconbitmap('tech-logo.ico')
+            auth_Window.iconbitmap('gui/icon/tech-logo.ico')
 
             text = Label(auth_Window, text="Please paste the auto generated url here after you logged in", font=("Arial", 13))
             auth_URL = StringVar()
@@ -358,7 +358,7 @@ class GuiRunner:
         restart_window.geometry("200x80+500+350")
         restart_window.title("Status")
         restart_window.resizable(False, False)
-        restart_window.iconbitmap('tech-logo.ico')
+        restart_window.iconbitmap('gui/icon/tech-logo.ico')
 
         def restart():
             self.loginWindow()
