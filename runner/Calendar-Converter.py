@@ -9,13 +9,10 @@ from gui.loginScreen import loginScreen
 
 def main():
     
-    # parser = jsonParser('s','s')
-    # courseElement, semester = parser.getCourseInformation("08")
-    #print(courseElement)
+   
     window = Tk()
     GuiRunner(window)
-    # gui = GuiRunner(window)
-    # gui.fillTable(courseElement)
+    
     window.mainloop()   
     
     
