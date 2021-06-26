@@ -1,5 +1,5 @@
 # OSCAR-to-Google-and-MSCalendar
-A application to automatically fetch course information from OSCAR and convert it in to events in Google calendar and Microsoft Calendar
+A application to automatically fetch course information from Georgia Tech's OSCAR and convert it in to events in Google calendar and Microsoft Calendar
 
 ## Get Started
 
@@ -11,7 +11,7 @@ Click 'Google Calendar' which will bring you to the login page (this is currentl
 ### Microsoft Calendar
 Click 'Microsoft Calendar' in the login window.
 After following with the login prompt in the browser, you will see a blank page with a random generated url
-![alt text](gui/icon/MLogInTutorial.PNG)
+![alt text](gui/icon/MSLogin.PNG)
 
 Simply copy and paste this url in the new window prompted from the program and click 'verify', which will log you in.
 
