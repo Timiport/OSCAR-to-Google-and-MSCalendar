@@ -3,7 +3,17 @@ A application to automatically fetch course information from OSCAR and convert i
 
 ## Get Started
 
-Temporarily (before I fix the bug in executable), running Calender-Conver.py in runner file will start the program
+Run 'Calendar-Converter.exe' to launch the program
+
+### Google Calendar
+Click 'Google Calendar' which will bring you to the login page (this is currently unavailable until Google's verification)
+
+### Microsoft Calendar
+Click 'Microsoft Calendar' in the login window.
+After following with the login prompt in the browser, you will see a blank page with a random generated url
+![alt text](gui/icon/MLogInTutorial.PNG)
+
+Simply copy and paste this url in the new window prompted from the program and click 'verify', which will log you in.
 
 ## Privacy Policy
 https://timiport.github.io/OSGMSCalendar-Privacy-Policy/
