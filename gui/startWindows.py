@@ -330,6 +330,12 @@ class GuiRunner:
             self.restartWindow()
 
     def launchMSCalendar(self, topWindow):
+        """Method to launch login screen in browser for Microsoft calendar
+
+        Args:
+            topWindow (TopLevel): the previous window that will trigger this method
+        """
+
         self.MSCalendarService = MSCalendar()
         self.isMCalendarService = True
         topWindow.destroy()
@@ -361,6 +367,8 @@ class GuiRunner:
             # print(self.connect.request_token(authURl))
 
     def restartWindow(self):
+        """Method that will prompt up failure note and restart login process
+        """
         restart_window = Toplevel()
         restart_window.geometry("200x80+500+350")
         restart_window.title("Status")
