@@ -28,7 +28,7 @@ class GuiRunner:
     def __init__(self, root):
         self.root = root
         self.root.geometry("1100x730+300+150")
-        self.root.title("OSCAR To MSCalendar Converter")
+        self.root.title("OSCAR To GMSCalendar Converter")
         self.root.resizable(False, False)
         self.root.iconbitmap('gui/icon/tech-logo.ico')
         self.courseDescription = getCourseList()
@@ -36,6 +36,7 @@ class GuiRunner:
         self.bottomLeftLabel = Label(self.root, text='', font=('Arial', 13))
         self.GoogleCalendarService = None
         self.MSCalendarService = None
+        self.isMCalendarService = False
         
         self.loginWindow()
         self.queryRow()
@@ -206,7 +207,10 @@ class GuiRunner:
                     format='%(asctime)s %(levelname)s %(name)s %(message)s')
         
         try:
-            createEvent(courseSubject, values[6], values[5], values[3], values[4])
+            if (self.isMCalendarService):
+                self.MSCalendarService.createEvent(courseSubject, values[6], values[5], values[3], values[4])
+            else:
+                createEvent(courseSubject, values[6], values[5], values[3], values[4])
         except Exception as e:
             messagebox.showinfo('Status', 'Error, please look into log.txt file')
             logging.error(traceback.format_exc())
@@ -316,15 +320,18 @@ class GuiRunner:
         lowerButton.pack(padx=5)
     
     def launchGoogleCalendar(self, topWindow):
+        self.isMCalendarService = False
+        
         self.GoogleCalendarService = getCalendarService()
+        topWindow.destroy()
         if self.GoogleCalendarService != None:
             messagebox.showinfo('Status', "Log in Successful.")
-            topWindow.destroy()
         else:
             self.restartWindow()
 
     def launchMSCalendar(self, topWindow):
         self.MSCalendarService = MSCalendar()
+        self.isMCalendarService = True
         topWindow.destroy()
         if (self.MSCalendarService.userAuthentication()):
             messagebox.showinfo('Status', "Log in Successful.")

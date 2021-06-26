@@ -62,7 +62,7 @@ def getTime(time, semester):
 
     Args:
         time (string): time of the course
-        semester (string): semester string of the course, include year and month
+        semester (string): semester string of the course, include year and month and date
 
     Returns:
         datetime object: an object used to initialize event time
