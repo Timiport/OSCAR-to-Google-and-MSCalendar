@@ -23,10 +23,6 @@ class MSCalendar:
         Returns:
             bool: true if the user is already authenticated false otherwise
         """
-        
-        # authenticate account
-        # if (account.authenticate(scopes=['calendar_all'])):
-        #      print("Authenticated")
 
         if not self.account.is_authenticated:    
             authURL = self.connect.get_authorization_url(self.protocal.get_scopes_for(['calendar_all']))

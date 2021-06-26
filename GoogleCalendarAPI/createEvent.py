@@ -40,10 +40,18 @@ def createEvent(subject, location, time, semester, weekDays):
             'RRULE:FREQ=WEEKLY;UNTIL=' + endDate + ';BYDAY=' + str(weeks)
         ],
     }
-    #print('RRULE:FREQ=WEEKLY;UNTIL=20211010;BYDATE=' + str(weeks))
     event = service.events().insert(calendarId='primary', body=event).execute()
 
 def getDate(dateRange):
+    """Process date range and return two strings with start date and end date
+
+    Args:
+        dateRange (string): date range of the course
+
+    Returns:
+        string: start date and end date of the course
+    """
+    
     start_Year = dateRange[dateRange.index(',')+2:dateRange.index(',')+6]
     end_Year = dateRange[dateRange.index(',', 12)+2:dateRange.index(',', 12)+6]
     start_Month = getMonth(dateRange[:3])

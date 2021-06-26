@@ -23,7 +23,6 @@ class jsonParser:
         f = open('result.json')
         course = json.load(f)
         courseInfo = list(filter(lambda x: semDate == x['semester'][4:] , course))
-        # allClassInfo = list(filter(lambda x: self.courseNumber[0] in x["identifier"], course))
         
         if len(courseInfo) == 0:
             raise ValueError("No information is available")
@@ -31,14 +30,8 @@ class jsonParser:
         classList = []
         for course in courseInfo:
             classList.append(course['sections'])
-        # classList = courseInfo[0]["sections"]
-        # If user input the wrong information, it will display all possible options for user to choose
-        # allClassList = allClassInfo[0]["sections"]
-        #semester = courseInfo[0]["semester"]
         
         return classList
 
-    # print(courseInfo[0]["crn"])
-    #print(json.dumps(courseInfo, indent = 4))
 
 
