@@ -379,7 +379,7 @@ class GuiRunner:
             self.loginWindow()
             restart_window.destroy()
         
-        message = Label(restart_window, text='Log in Uncessful', font=('Arial', 13))
+        message = Label(restart_window, text='Log in Unccessful', font=('Arial', 13))
         button = Button(restart_window, text='OK', font=("Arial", 13), command=restart)
 
         message.pack(pady=(5,10))
