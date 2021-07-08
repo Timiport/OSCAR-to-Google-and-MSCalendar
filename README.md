@@ -6,7 +6,9 @@ A application to automatically fetch course information from Georgia Tech's OSCA
 Run 'Calendar-Converter.exe' to launch the program
 
 ### Google Calendar
-Click 'Google Calendar' which will bring you to the login page (this is currently unavailable until Google's verification)
+Click 'Google Calendar' which will bring you to the login page. 
+
+Beware that you will get a warning screen when you login since I don't want to bother with Google's verification, and this software is majorly for my personal use only.
 
 ### Microsoft Calendar
 Click 'Microsoft Calendar' in the login window.
