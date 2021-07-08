@@ -28,7 +28,7 @@ class GuiRunner:
     def __init__(self, root):
         self.root = root
         self.root.geometry("1100x730+300+150")
-        self.root.title("OSCAR To MSCalendar Converter")
+        self.root.title("OSCAR To GMSCalendar Converter")
         self.root.resizable(False, False)
         self.root.iconbitmap('gui/icon/tech-logo.ico')
         self.courseDescription = getCourseList()
