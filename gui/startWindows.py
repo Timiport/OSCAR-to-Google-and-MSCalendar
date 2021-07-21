@@ -9,6 +9,7 @@ from multiprocessing import Process
 from threading import Thread, Timer
 from tkinter import font, ttk, messagebox
 from string import ascii_uppercase
+import subprocess
 
 from GoogleCalendarAPI.authenticate import getCalendarService
 from GoogleCalendarAPI.createEvent import createEvent
@@ -18,7 +19,6 @@ from multiprocessing import Process
 from tkinter import *
 from gui.courseDescription import getCourseList
 
-from runner.crawlerRunner import crawlCourseJson
 from runner.jsonParser import jsonParser
 from grouch import settings
 from grouch.settingsReader import *
@@ -51,7 +51,7 @@ class GuiRunner:
 
         # courseDropDown = OptionMenu(initFrame, courseName, *self.courseDescription)
         courseDropDown = ttk.Combobox(initFrame, textvariable=courseName, values=self.courseDescription, 
-                                        width=15, height=15, font=("Arial", 13))
+                                        width=20, height=15, font=("Arial", 13))
         # self.courseDropDown.bind("<Key>", self.findCourseInDropDown)
         def on_click_delete(event):
             event.widget.delete(0, END)
@@ -220,7 +220,7 @@ class GuiRunner:
         
 
     def fetchCourse(self, courseName, semDate, courseNumber, progress, getCourseButton):
-
+        # crawlCourseJson()
         self.bottomLeftLabel.config(text='Fetching Course Information ...')
         
         Stop_Thread = False
@@ -237,8 +237,10 @@ class GuiRunner:
         setCourseName(courseName[:courseName.index(":")])      
         setCourseIdentifier(courseNumber)
     
-        crawlerThread = Thread(target=crawlCourseJson)      
-        getCourseButton.config(state='disabled')       
+        crawlerThread = Thread(target=self.crawl_course_json)
+             
+        getCourseButton.config(state='disabled')   
+            
         crawlerThread.start() 
         crawlerThread.join()
         
@@ -384,5 +386,8 @@ class GuiRunner:
 
         message.pack(pady=(5,10))
         button.pack(pady=(0,5))
+
+    def crawl_course_json(self):
+        subprocess.call(['crawlerRunner.exe'])
 
         
