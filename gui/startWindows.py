@@ -51,7 +51,7 @@ class GuiRunner:
 
         # courseDropDown = OptionMenu(initFrame, courseName, *self.courseDescription)
         courseDropDown = ttk.Combobox(initFrame, textvariable=courseName, values=self.courseDescription, 
-                                        width=20, height=15, font=("Arial", 13))
+                                        width=25, height=15, font=("Arial", 13))
         # self.courseDropDown.bind("<Key>", self.findCourseInDropDown)
         def on_click_delete(event):
             event.widget.delete(0, END)
@@ -92,7 +92,7 @@ class GuiRunner:
 
         #Add object to windows
         initFrame.grid(row=0, column=0, padx=(20,0), pady=20)
-        courseDropDown.grid(row=0, column=0, padx=20, pady=20)
+        courseDropDown.grid(row=0, column=0, padx=(20,10), pady=20)
         courseNumLabel.grid(row=0,column=1, padx=(50,0))
         courseNumber.grid(row=0,column=2)
  
@@ -293,7 +293,7 @@ class GuiRunner:
     
     def loginWindow(self):
         login_Window = Toplevel(self.root)
-        login_Window.geometry("400x210+500+350")
+        login_Window.geometry("390x200+500+350")
         login_Window.title("Login Calendar")
         login_Window.resizable(False, False)
         login_Window.iconbitmap('gui/icon/tech-logo.ico')
@@ -303,23 +303,21 @@ class GuiRunner:
     def loginCalendar(self, window):
 
         global msPhotoImage, msImage, googleImage, googlePhotoImage
-        googleImage = Image.open('gui/icon/google.png')
-        googleImage = googleImage.resize((100, 100), Image.ANTIALIAS)
+        googleImage = Image.open('gui/icon/google-icon.png')
+        # googleImage = googleImage.resize((400, 100), Image.ANTIALIAS)
         googlePhotoImage = ImageTk.PhotoImage(googleImage)
 
-        msImage = Image.open('gui/icon/microsoft.png')
-        msImage = msImage.resize((100,100), Image.ANTIALIAS)
+        msImage = Image.open('gui/icon/ms-icon.png')
+        # msImage = msImage.resize((400,150), Image.ANTIALIAS)
         msPhotoImage = ImageTk.PhotoImage(msImage)
 
-        upperButton = Button(window, text= 'Google Calendar', image=googlePhotoImage, compound='left', 
-                                font=('Arial', 13), width=400, height=90, padx=100, command=lambda: self.launchGoogleCalendar(window))
+        upperButton = Button(window, image=googlePhotoImage, command=lambda: self.launchGoogleCalendar(window))
 
-        lowerButton = Button(window, text= 'Microsoft Calendar', image=msPhotoImage, compound='left', 
-                                font=('Arial', 13), width=400, height=90, padx=100, command=lambda: self.launchMSCalendar(window))
+        lowerButton = Button(window, image=msPhotoImage, command=lambda: self.launchMSCalendar(window))
 
 
         upperButton.pack(pady=(5,5), padx=5)
-        lowerButton.pack(padx=5)
+        lowerButton.pack(padx=5, pady=(0,5))
     
     def launchGoogleCalendar(self, topWindow):
         self.isMCalendarService = False

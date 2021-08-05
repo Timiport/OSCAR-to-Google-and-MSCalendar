@@ -21,10 +21,13 @@ def getCalendarService():
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 'credentials.json', SCOPES, redirect_uri = 'https://timiport.github.io/OSGMS-Calendar-Home/')
-            creds = flow.run_local_server(port=0)
+            creds = flow.run_local_server()
+            # creds = flow.run_console()
         # Save the credentials for the next run
         with open('token.json', 'w') as token:
             token.write(creds.to_json())
 
     service = build('calendar', 'v3', credentials=creds, cache_discovery=False)
     return service
+
+    

@@ -20,7 +20,7 @@ SEMESTER_STOP = 3
 
 SUBJECTS = ['ACCT']
 SEMESTER_ACCEPT = ("02", "08", "05")  # Has to be a tuple
-COURSE_IDENTIFIER = '2102'
+COURSE_IDENTIFIER = '2101'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'grouch (+http://www.yourdomain.com)'
