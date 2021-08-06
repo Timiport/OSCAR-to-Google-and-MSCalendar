@@ -8,7 +8,7 @@ Run 'Calendar-Converter.exe' to launch the program
 ### Google Calendar
 Click 'Google Calendar' which will bring you to the login page. 
 
-This software is still going through Google's verification process. I will update once I got verified.
+This software has gone through and passed Google's app verification because it needs to access and edit events in your calendar. To leanr more, please view this app's [privacy policy](#privacy-policy).
 
 ### Microsoft Calendar
 Click 'Microsoft Calendar' in the login window.
