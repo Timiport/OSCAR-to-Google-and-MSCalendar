@@ -1,5 +1,6 @@
 import scrapy
-from scrapy.loader.processors import TakeFirst, Identity, Join, Compose
+from itemloaders.processors import TakeFirst, Identity, Join, Compose
+from scrapy.loader import ItemLoader
 import grouch.parsers.prerequisite_parser as pp
 import grouch.parsers.restriction_parser as rp
 import grouch.parsers.attribute_parser as ap
@@ -7,7 +8,7 @@ import grouch.parsers.hour_parser as hp
 import grouch.parsers.basis_parser as bp
 
 
-class CourseLoader(scrapy.loader.ItemLoader):
+class CourseLoader(ItemLoader):
     default_output_processor = TakeFirst()
     default_input_processor = TakeFirst()
 

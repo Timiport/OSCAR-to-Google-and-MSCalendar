@@ -1,12 +1,10 @@
-from inspect import Traceback
 import sys
 import os
 sys.path.append(os.getcwd())
 import time
 import logging
 import traceback
-from multiprocessing import Process
-from threading import Thread, Timer
+from threading import Thread
 from tkinter import font, ttk, messagebox
 from string import ascii_uppercase
 import subprocess
@@ -14,13 +12,10 @@ import subprocess
 from GoogleCalendarAPI.authenticate import getCalendarService
 from GoogleCalendarAPI.createEvent import createEvent
 from MSCalendarAPI.calendarCreater import MSCalendar
-import grouch.spiders.oscar_spider as osp
-from multiprocessing import Process
 from tkinter import *
 from gui.courseDescription import getCourseList
 
 from runner.jsonParser import jsonParser
-from grouch import settings
 from grouch.settingsReader import *
 from PIL import Image, ImageTk
 

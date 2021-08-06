@@ -12,18 +12,6 @@ def crawlCourseJson():
         pass
 
 
-    os.system('scrapy crawl -o result.json -t json oscar')
-    # try:
-    #     os.remove('result.json')
-    # except OSError:
-    #     pass
-    # process = CrawlerProcess({
-    #     'USER_AGENT': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)',
-    #     'FEED_FORMAT': 'json',
-    #     'FEED_URI': 'result.json'
-    #     })
-        
-    # process.crawl(OscarSpider)
-    # process.start()
+    os.system('scrapy crawl -o result.json oscar')
 
 crawlCourseJson()

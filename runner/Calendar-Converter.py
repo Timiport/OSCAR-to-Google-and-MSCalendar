@@ -9,7 +9,8 @@ def main():
     window = Tk()
     GuiRunner(window)
     
-    window.mainloop()          
+    window.mainloop()
+          
 
 if __name__ == "__main__":
     main()

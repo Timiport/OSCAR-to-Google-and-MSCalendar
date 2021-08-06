@@ -1,8 +1,6 @@
 from datetime import date, datetime
 import sys
 import os
-from types import ModuleType
-from webbrowser import get
 sys.path.append(os.getcwd())
 from GoogleCalendarAPI.authenticate import getCalendarService
 
