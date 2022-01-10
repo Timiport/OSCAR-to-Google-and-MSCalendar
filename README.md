@@ -2,7 +2,7 @@
 A application to automatically fetch course information from Georgia Tech's OSCAR and convert it in to events in Google calendar and Microsoft Calendar
 
 ## Get Started
-
+Make sure you have `scrapy` installed in your machine  
 Run `Calendar-Converter.exe` to launch the program
 
 ### Google Calendar
